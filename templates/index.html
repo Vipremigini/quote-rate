@@ -8,9 +8,9 @@
 <body>
     <h1>Rate the Similarity of These Quotes</h1>
     
-    <div>
-        <p><strong>Quote 1:</strong> {{ quotes[0][1] }}</p>
-        <p><strong>Quote 2:</strong> {{ quotes[1][1] }}</p>
+    <div id="quotes-container">
+        <p><strong>Quote 1:</strong> <span id="quote1">{{ quotes[0][1] }}</span></p>
+        <p><strong>Quote 2:</strong> <span id="quote2">{{ quotes[1][1] }}</span></p>
     </div>
 
     <form id="rating-form">
@@ -36,12 +36,13 @@
     <p id="response-message"></p>
 
     <script>
+        let tableChoice = "{{ table_choice }}";
+        let quoteIds = [{{ quotes[0][0] }}, {{ quotes[1][0] }}];
+
         document.getElementById('rating-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
             const rating = document.querySelector('input[name="rating"]:checked').value;
-            const tableChoice = "{{ table_choice }}";
-            const quoteIds = [{{ quotes[0][0] }}, {{ quotes[1][0] }}];
 
             fetch('/rate', {
                 method: 'POST',
@@ -51,7 +52,19 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById('response-message').innerText = 'Thank you for your rating!';
+                    document.getElementById('response-message').innerText = 'Thank you for your rating! Fetching new quotes...';
+
+                    // Fetch new quotes
+                    fetch('/get_new_quotes')
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('quote1').innerText = data.quotes[0][1];
+                            document.getElementById('quote2').innerText = data.quotes[1][1];
+                            tableChoice = data.table_choice;
+                            quoteIds = [data.quotes[0][0], data.quotes[1][0]];
+                            document.getElementById('rating-form').reset(); // Clear the form
+                            document.getElementById('response-message').innerText = ''; // Clear response message
+                        });
                 }
             });
         });
