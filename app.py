@@ -32,7 +32,7 @@ def rate():
     table_choice = data['table']
     quote_ids = data['quote_ids']
     
-    # Save the rating to the appropriate table
+
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(f"INSERT INTO {table_choice}_ratings (quote1_id, quote2_id, rating) VALUES (%s, %s, %s)", 
