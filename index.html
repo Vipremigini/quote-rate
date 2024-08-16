@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Quotes Similarity</title>
+</head>
+<body>
+    <h1>Rate the Similarity of These Quotes</h1>
+    
+    <div>
+        <p><strong>Quote 1:</strong> {{ quotes[0][1] }}</p>
+        <p><strong>Quote 2:</strong> {{ quotes[1][1] }}</p>
+    </div>
+
+    <form id="rating-form">
+        <label>
+            <input type="radio" name="rating" value="1" required> Different (1 point)
+        </label><br>
+        <label>
+            <input type="radio" name="rating" value="2"> Little Different (2 points)
+        </label><br>
+        <label>
+            <input type="radio" name="rating" value="3"> Similar (3 points)
+        </label><br>
+        <label>
+            <input type="radio" name="rating" value="4"> Very Similar (4 points)
+        </label><br>
+        <label>
+            <input type="radio" name="rating" value="5"> Same (5 points)
+        </label><br><br>
+
+        <button type="submit">Submit Rating</button>
+    </form>
+
+    <p id="response-message"></p>
+
+    <script>
+        document.getElementById('rating-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const rating = document.querySelector('input[name="rating"]:checked').value;
+            const tableChoice = "{{ table_choice }}";
+            const quoteIds = [{{ quotes[0][0] }}, {{ quotes[1][0] }}];
+
+            fetch('/rate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rating: rating, table: tableChoice, quote_ids: quoteIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('response-message').innerText = 'Thank you for your rating!';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
