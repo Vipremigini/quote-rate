@@ -42,5 +42,18 @@ def rate():
     
     return jsonify({'success': True})
 
+@app.route('/get_new_quotes', methods=['GET'])
+def get_new_quotes():
+    table_choice = random.choice(['botquotes', 'cgptquotes'])
+
+    # Fetch two random quotes from the chosen table
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT id, quote FROM {table_choice} ORDER BY RANDOM() LIMIT 2")
+    quotes = cursor.fetchall()
+    conn.close()
+
+    return jsonify({'quotes': quotes, 'table_choice': table_choice})
+
 if __name__ == '__main__':
     app.run(debug=True)
